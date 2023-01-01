@@ -1,25 +1,38 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.25.1)
 project(sfml_tut)
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+# Set up the main target
+set(TARGET "${PROJECT_NAME}")
+add_executable(${TARGET})
+set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 20)
 
 # Set version information
-set(${PROJECT_BINARY_DIR}_VERSION_MAJOR 1)
-set(${PROJECT_BINARY_DIR}_VERSION_MINOR 0)
+set(${TARGET}_VERSION_MAJOR 1)
+set(${TARGET}_VERSION_MINOR 0)
 
-# Define sources and executable
-set(EXECUTABLE_NAME "${PROJECT_NAME}")
-add_executable(${EXECUTABLE_NAME} main.cc)
+# Include modules
+add_subdirectory(modules)
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2.5 REQUIRED system window graphics network audio)
-target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
+find_package(fmt)
+set(OpenGL_GL_PREFERENCE GLVND)
+find_package(OpenGL REQUIRED)
+target_link_libraries(${TARGET} ${SFML_LIBRARIES} fmt::fmt OpenGL::GL)
+
+# Add some sources
+target_sources(${TARGET} PRIVATE
+    main.cc
+)
 
 # Install target
-install(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)
+install(TARGETS ${TARGET} DESTINATION bin)
 
 # CPack packaging
 include(InstallRequiredSystemLibraries)
-set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_BINARY_DIR}_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_BINARY_DIR}_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${${TARGET}_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${${TARGET}_VERSION_MINOR}")
 include(CPack)
 
