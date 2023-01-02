@@ -1,6 +1,6 @@
-#include "modules/spdlog/include/spdlog/sinks/basic_file_sink.h"
-#include "modules/spdlog/include/spdlog/sinks/stdout_color_sinks.h"
-#include "modules/spdlog/include/spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
@@ -9,8 +9,8 @@
 #include <fmt/core.h>
 
 #ifndef NDEBUG
-#include "modules/imgui-sfml/imgui-SFML.h"
-#include "modules/imgui/imgui.h"
+#include "imgui-SFML.h"
+#include "imgui.h"
 #endif
 
 namespace fs = std::filesystem;

@@ -13,19 +13,17 @@ set(${TARGET}_VERSION_MINOR 0)
 
 # Include modules
 add_subdirectory(modules)
+add_subdirectory(cmake_modules)
 
 # Detect and add SFML
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2.5 REQUIRED system window graphics network audio)
 find_package(fmt)
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET} ${SFML_LIBRARIES} fmt::fmt OpenGL::GL)
 
-# Add some sources
-target_sources(${TARGET} PRIVATE
-    main.cc
-)
+# Add the sources
+add_subdirectory(src)
 
 # Install target
 install(TARGETS ${TARGET} DESTINATION bin)
