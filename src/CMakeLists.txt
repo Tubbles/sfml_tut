@@ -2,4 +2,5 @@
 target_sources(${TARGET} PRIVATE
     main.cpp
     log.cpp
+    event.cpp
 )

@@ -1,3 +1,6 @@
+// Copyright (C) Tubbles github.com/Tubbles
+
+#include "event.hpp"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
@@ -5,6 +8,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <filesystem>
 #include <fmt/core.h>
 
@@ -19,7 +23,7 @@ static void setup_spdlog(fs::path &my_dir) {
     static const std::string log_filename{my_dir.string() + std::string{"/log.txt"}};
 
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    console_sink->set_level(spdlog::level::warn);
+    console_sink->set_level(spdlog::level::debug);
     auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename.c_str(), true);
     file_sink->set_level(spdlog::level::trace);
     spdlog::sinks_init_list sinks{console_sink, file_sink};
@@ -64,6 +68,30 @@ int main(int argc, char *argv[]) {
 
     sf::Clock deltaClock;
 
+#ifndef NDEBUG
+    bool show_imgui = false;
+
+    event::register_callback(event::Event::KeyPressed, 500, [&show_imgui](event::Event &event) {
+        if (event.key.code == sf::Keyboard::F1) {
+            show_imgui = !show_imgui;
+        }
+        return false;
+    });
+#endif
+
+    event::register_callback(event::Event::Closed, 999, [&window](event::Event &event) {
+        window.close();
+        return true;
+    });
+
+    event::register_callback(event::Event::KeyPressed, 999, [&window](event::Event &event) {
+        if (event.key.code == sf::Keyboard::Escape) {
+            window.close();
+            return true;
+        }
+        return false;
+    });
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -71,27 +99,28 @@ int main(int argc, char *argv[]) {
             ImGui::SFML::ProcessEvent(window, event);
 #endif
 
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                window.close();
+            event::execute_callbacks(event);
         }
 
 #ifndef NDEBUG
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        ImGui::Begin("FPS");
-        ImGui::Text("%.1f", ImGui::GetIO().Framerate);
-        ImGui::End();
+        if (show_imgui) {
+            ImGui::Begin("FPS");
+            ImGui::Text("%.1f", ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
 #endif
 
         window.clear();
         window.draw(shape);
 
 #ifndef NDEBUG
-        ImGui::SFML::Render(window);
+        if (show_imgui) {
+            ImGui::SFML::Render(window);
+        } else {
+            ImGui::EndFrame();
+        }
 #endif
 
         window.display();

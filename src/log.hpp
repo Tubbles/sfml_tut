@@ -3,6 +3,5 @@
 #pragma once
 
 namespace log {
-    void setup();
+void setup();
 }
-

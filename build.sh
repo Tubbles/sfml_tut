@@ -9,6 +9,7 @@ app_name="$(grep -E '^project(.+)' CMakeLists.txt | sed -E 's/project\((.+)\)/\1
 implicit_build=true
 build=false
 clean=false
+format=false
 run=false
 verbose=false
 extra_verbose=false
@@ -17,52 +18,57 @@ target_dir_target="$target_dir/debug"
 
 usage="Usage: $0 [options]
 where [options] can be zero or more of:
-  ?,h,help,--help     display this help text and exit
-  v,verbose           run more verbosely
-  extra-verbose       run with all verbose text
-  debug,release       build for debug (default) or release target
-  clean               clean everything, does not build implicitly
-  build               build, implicitly selected
-  run                 run the application after a successful build, forces build"
+  ?,h,help,--help    display this help text and exit
+  v,verbose          run more verbosely
+  extra-verbose      run with all verbose text
+  debug,release      build for debug (default) or release target
+  clean              clean everything, does not build implicitly
+  build              build, implicitly selected
+  format             format all source code, does not build implicitly
+  run                run the application after a successful build, forces build"
 
 while (($#)); do
 case $1 in
-\?|h|help|--help)
-    echo "$usage"
-    exit 0
-    ;;
-v|verbose)
-    verbose=true
-    ;;
-extra-verbose)
-    verbose=true
-    extra_verbose=true
-    set -x
-    ;;
-debug)
-    target="debug" || $run == true
-    target_dir_target="$target_dir/debug"
-    ;;
-release)
-    target="release"
-    target_dir_target="$target_dir/release"
-    ;;
-clean)
-    clean=true
-    implicit_build=false
-    ;;
-build)
-    build=true
-    ;;
-run)
-    build=true
-    run=true
-    ;;
-*)
-    echo "Unknown argument: \"$1\""
-    echo "$usage"
-    exit 1
-    ;;
+    \?|h|help|--help)
+        echo "$usage"
+        exit 0
+        ;;
+    v|verbose)
+        verbose=true
+        ;;
+    extra-verbose)
+        verbose=true
+        extra_verbose=true
+        set -x
+        ;;
+    debug)
+        target="debug" || $run == true
+        target_dir_target="$target_dir/debug"
+        ;;
+    release)
+        target="release"
+        target_dir_target="$target_dir/release"
+        ;;
+    clean)
+        clean=true
+        implicit_build=false
+        ;;
+    build)
+        build=true
+        ;;
+    format)
+        format=true
+        implicit_build=false
+        ;;
+    run)
+        build=true
+        run=true
+        ;;
+    *)
+        echo "Unknown argument: \"$1\""
+        echo "$usage"
+        exit 1
+        ;;
 esac
 shift
 done
@@ -92,6 +98,8 @@ if [[ $implicit_build == true ]]; then
     build=true
 fi
 
+clang-format --style=file -i "$my_dir/src/"*.{cpp,hpp}
+
 if [[ $clean == true ]]; then
     rm -fr "$target_dir"
     rm -fr "$my_dir/compile_commands.json"
@@ -105,5 +113,3 @@ if [[ $build == true ]]; then
         "$target_dir_target/$app_name"
     fi
 fi
-
-cp -f "$target_dir_target/compile_commands.json" "$my_dir" 2>/dev/null || :
