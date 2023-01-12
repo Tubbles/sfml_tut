@@ -25,7 +25,8 @@ where [options] can be zero or more of:
   clean              clean everything, does not build implicitly
   build              build, implicitly selected
   format             format all source code, does not build implicitly
-  run                run the application after a successful build, forces build"
+  run                run the application after a successful build, forces build
+  --                 pass the following args to the program, if running"
 
 while (($#)); do
 case $1 in
@@ -63,6 +64,10 @@ case $1 in
     run)
         build=true
         run=true
+        ;;
+    --)
+        shift
+        break
         ;;
     *)
         echo "Unknown argument: \"$1\""
@@ -110,6 +115,6 @@ if [[ $build == true ]]; then
     cmake $cmake_verbose -S "$my_dir" -B "$target_dir_target" -G Ninja $cmake_debug
     cmake --build "$target_dir_target" -- $ninja_verbose
     if [[ $run == true ]]; then
-        "$target_dir_target/$app_name"
+        "$target_dir_target/$app_name" "$@"
     fi
 fi

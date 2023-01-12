@@ -1,66 +1,35 @@
 // Copyright (C) Tubbles github.com/Tubbles
 
 #include "event.hpp"
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/spdlog.h"
+#include "log.hpp"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <filesystem>
 #include <fmt/core.h>
 
 #ifndef NDEBUG
-#include "imgui-SFML.h"
-#include "imgui.h"
+#include "debug.hpp"
 #endif
 
-namespace fs = std::filesystem;
-
-static void setup_spdlog(fs::path &my_dir) {
-    static const std::string log_filename{my_dir.string() + std::string{"/log.txt"}};
-
-    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    console_sink->set_level(spdlog::level::debug);
-    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_filename.c_str(), true);
-    file_sink->set_level(spdlog::level::trace);
-    spdlog::sinks_init_list sinks{console_sink, file_sink};
-
-    auto logger = std::make_shared<spdlog::logger>("main", sinks);
-    logger.get()->set_level(spdlog::level::debug);
-    spdlog::set_default_logger(logger);
-}
-
-#ifndef NDEBUG
-static void setup_imgui(fs::path &my_dir, sf::RenderWindow &window) {
-    static const std::string imgui_ini_filename{my_dir.string() + std::string{"/imgui.ini"}};
-    static const std::string imgui_log_filename{my_dir.string() + std::string{"/imgui_log.txt"}};
-
-    if (!ImGui::SFML::Init(window)) {
-        spdlog::error("ImGui initialization failed");
-    }
-
-    ImGui::GetIO().IniFilename = imgui_ini_filename.c_str();
-    ImGui::GetIO().LogFilename = imgui_log_filename.c_str();
-}
-#endif
-
-int main(int argc, char *argv[]) {
+auto main(int argc, char *argv[]) -> int {
     std::vector<std::string> args(argv, argv + argc);
     fs::path prog{args[0]};
     fs::path my_dir{fs::canonical(prog.parent_path()).string()};
 
-    setup_spdlog(my_dir);
+    lg::setup(my_dir);
     spdlog::info("Application started");
 
+    for (auto &arg : args) {
+        spdlog::info("Arg #{}#", arg);
+    }
+
     sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Tutorial");
-    window.setVerticalSyncEnabled(true);
+    window.setVerticalSyncEnabled(true); // Cap at 60 Hz
 
 #ifndef NDEBUG
-    setup_imgui(my_dir, window);
-    spdlog::info("ImGui started");
+    debug::setup(my_dir, window);
 #endif
 
     sf::CircleShape shape(100.f);
@@ -80,6 +49,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     event::register_callback(event::Event::Closed, 999, [&window](event::Event &event) {
+        (void)event;
         window.close();
         return true;
     });
@@ -93,7 +63,7 @@ int main(int argc, char *argv[]) {
     });
 
     while (window.isOpen()) {
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event)) {
 #ifndef NDEBUG
             ImGui::SFML::ProcessEvent(window, event);
@@ -107,7 +77,7 @@ int main(int argc, char *argv[]) {
 
         if (show_imgui) {
             ImGui::Begin("FPS");
-            ImGui::Text("%.1f", ImGui::GetIO().Framerate);
+            ImGui::Text("%s", fmt::format("{:.1f}", ImGui::GetIO().Framerate).c_str());
             ImGui::End();
         }
 #endif
