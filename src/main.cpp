@@ -1,6 +1,8 @@
 // Copyright (C) Tubbles github.com/Tubbles
 
 #include "event.hpp"
+#include "imgui-SFML.h"
+#include "imgui.h"
 #include "log.hpp"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

@@ -7,8 +7,9 @@ target_dir="$my_dir/target"
 app_name="$(grep -E '^project(.+)' CMakeLists.txt | sed -E 's/project\((.+)\)/\1/g')"
 
 implicit_build=true
-build=false
 clean=false
+build=false
+lint=false
 format=false
 run=false
 verbose=false
@@ -24,6 +25,7 @@ where [options] can be zero or more of:
   debug,release      build for debug (default) or release target
   clean              clean everything, does not build implicitly
   build              build, implicitly selected
+  lint               run static analysis on the code
   format             format all source code, does not build implicitly
   run                run the application after a successful build, forces build
   --                 pass the following args to the program, if running"
@@ -56,6 +58,10 @@ case $1 in
         ;;
     build)
         build=true
+        ;;
+    lint)
+        lint=true
+        implicit_build=false
         ;;
     format)
         format=true
@@ -107,14 +113,19 @@ clang-format --style=file -i "$my_dir/src/"*.{cpp,hpp}
 
 if [[ $clean == true ]]; then
     rm -fr "$target_dir"
-    rm -fr "$my_dir/compile_commands.json"
 fi
 
 if [[ $build == true ]]; then
     mkdir -p "$target_dir_target"
     cmake $cmake_verbose -S "$my_dir" -B "$target_dir_target" -G Ninja $cmake_debug
     cmake --build "$target_dir_target" -- $ninja_verbose
-    if [[ $run == true ]]; then
-        "$target_dir_target/$app_name" "$@"
-    fi
+fi
+
+if [[ $lint == true ]]; then
+      clang-tidy -p "$my_dir/target/debug" "$my_dir/src"/*.cpp
+      clang-tidy -p "$my_dir/target/debug" --config-file="$my_dir/.clang-tidy-fixes" --fix --format-style=file "$my_dir/src"/*.{cpp,hpp}
+fi
+
+if [[ $run == true ]]; then
+    "$target_dir_target/$app_name" "$@"
 fi

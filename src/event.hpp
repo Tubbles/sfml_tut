@@ -6,10 +6,10 @@
 #include <functional>
 
 namespace event {
-typedef sf::Event Event;
-typedef sf::Event::EventType Type;
+using sf::Event;
+using Type = sf::Event::EventType;
 // event::Callback typedef, return true if the event processing is finished
-typedef std::function<bool(Event &)> Callback;
-void register_callback(Type type, uint32_t priority, Callback callback);
+using Callback = std::function<bool(Event &)>;
+void register_callback(Type type, uint32_t priority, const Callback &callback);
 void execute_callbacks(Event &event);
 } // namespace event

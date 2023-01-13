@@ -12,9 +12,10 @@ struct PrioCallback {
     uint32_t prio;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static std::map<Type, std::vector<PrioCallback>> callbacks;
 
-void register_callback(sf::Event::EventType type, uint32_t priority, Callback callback) {
+void register_callback(sf::Event::EventType type, uint32_t priority, const Callback &callback) {
     spdlog::debug("Attempting to register callback for event type {} with priority {}", type, priority);
     auto &vec = callbacks[type];
 

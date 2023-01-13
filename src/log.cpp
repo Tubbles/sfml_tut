@@ -16,7 +16,7 @@ void setup(fs::path &my_dir) {
     spdlog::sinks_init_list sinks{console_sink, file_sink};
 
     auto logger = std::make_shared<spdlog::logger>("main", sinks);
-    logger.get()->set_level(spdlog::level::debug);
+    logger->set_level(spdlog::level::debug);
     spdlog::set_default_logger(logger);
 }
 } // namespace lg

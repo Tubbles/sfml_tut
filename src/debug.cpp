@@ -1,6 +1,8 @@
 // Copyright (C) Tubbles github.com/Tubbles
 
 #include "debug.hpp"
+#include "imgui-SFML.h"
+#include "imgui.h"
 #include "log.hpp"
 
 namespace debug {

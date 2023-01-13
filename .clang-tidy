@@ -19,7 +19,8 @@ Checks:          'clang-diagnostic-*,clang-analyzer-*,
                   -cppcoreguidelines-pro-type-union-access,
                   -cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,
                   -hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,
-                  -cppcoreguidelines-pro-type-vararg,-hicpp-vararg'
+                  -cppcoreguidelines-pro-type-vararg,-hicpp-vararg,
+                  -llvm-header-guard'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false

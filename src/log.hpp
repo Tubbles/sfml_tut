@@ -7,4 +7,4 @@
 
 namespace lg {
 void setup(fs::path &my_dir);
-}
+} // namespace lg
