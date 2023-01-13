@@ -17,6 +17,6 @@ void setup(fs::path &my_dir, sf::RenderWindow &window) {
     ImGui::GetIO().IniFilename = imgui_ini_filename.c_str();
     ImGui::GetIO().LogFilename = imgui_log_filename.c_str();
 
-    spdlog::info("ImGui started");
+    spdlog::info("ImGui started, press F1 to toggle overlay");
 }
 } // namespace debug

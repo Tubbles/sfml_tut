@@ -27,6 +27,8 @@ auto main(int argc, char *argv[]) -> int {
         spdlog::info("Arg #{}#", arg);
     }
 
+    event::schd::post(event::schd::Event{.type = event::schd::Type::Init, .init = {}});
+
     sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Tutorial");
     window.setVerticalSyncEnabled(true); // Cap at 60 Hz
 
@@ -42,7 +44,7 @@ auto main(int argc, char *argv[]) -> int {
 #ifndef NDEBUG
     bool show_imgui = false;
 
-    event::register_callback(event::Event::KeyPressed, 500, [&show_imgui](event::Event &event) {
+    event::sfml::register_callback(event::sfml::Type::KeyPressed, 500, [&show_imgui](event::sfml::Event &event) {
         if (event.key.code == sf::Keyboard::F1) {
             show_imgui = !show_imgui;
         }
@@ -50,13 +52,13 @@ auto main(int argc, char *argv[]) -> int {
     });
 #endif
 
-    event::register_callback(event::Event::Closed, 999, [&window](event::Event &event) {
+    event::sfml::register_callback(event::sfml::Type::Closed, 999, [&window](event::sfml::Event &event) {
         (void)event;
         window.close();
         return true;
     });
 
-    event::register_callback(event::Event::KeyPressed, 999, [&window](event::Event &event) {
+    event::sfml::register_callback(event::sfml::Type::KeyPressed, 999, [&window](event::sfml::Event &event) {
         if (event.key.code == sf::Keyboard::Escape) {
             window.close();
             return true;
@@ -71,9 +73,17 @@ auto main(int argc, char *argv[]) -> int {
             ImGui::SFML::ProcessEvent(window, event);
 #endif
 
-            event::execute_callbacks(event);
+            event::sfml::post(event);
         }
 
+        // Update
+        event::schd::post(event::schd::Event{.type = event::schd::Type::Update, .update = {deltaClock.restart()}});
+
+        window.clear();
+        window.draw(shape);
+
+        // Draw
+        event::schd::post(event::schd::Event{.type = event::schd::Type::Draw, .draw = {}});
 #ifndef NDEBUG
         ImGui::SFML::Update(window, deltaClock.restart());
 
@@ -81,14 +91,6 @@ auto main(int argc, char *argv[]) -> int {
             ImGui::Begin("FPS");
             ImGui::Text("%s", fmt::format("{:.1f}", ImGui::GetIO().Framerate).c_str());
             ImGui::End();
-        }
-#endif
-
-        window.clear();
-        window.draw(shape);
-
-#ifndef NDEBUG
-        if (show_imgui) {
             ImGui::SFML::Render(window);
         } else {
             ImGui::EndFrame();
@@ -98,6 +100,8 @@ auto main(int argc, char *argv[]) -> int {
         window.display();
     }
 
+    // Shutdown
+    event::schd::post(event::schd::Event{.type = event::schd::Type::Shutdown, .shutdown = {}});
 #ifndef NDEBUG
     ImGui::SFML::Shutdown();
 #endif
