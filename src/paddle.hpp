@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "collision.hpp"
 #include "event.hpp"
 #include "log.hpp"
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -12,6 +13,7 @@ struct Paddle {
         Two,
     };
     explicit Paddle(Player a_player) : player(a_player), shape{{10, 40}} {
+        col::register_shape(shape);
         if (player == Player::One) {
             keymap = {sf::Keyboard::A, sf::Keyboard::Z, sf::Keyboard::Q};
             shape.setPosition({10, 240});
@@ -57,6 +59,10 @@ struct Paddle {
             shape.move(0.0f, (up_vel + down_vel) * speed * time.asSeconds());
 
             // Check collision
+            for (auto col : col::get(shape)) {
+                (void)col;
+                spdlog::debug("Collision detected!");
+            }
             auto pos = shape.getPosition();
             auto size = shape.getSize();
             static const sf::Vector2f upper_lim{0.0f, 0.0f};

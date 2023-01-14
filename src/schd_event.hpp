@@ -16,9 +16,7 @@ struct Event {
         sf::RenderWindow *window{};
     };
 
-    struct ShutdownEvent {
-        int a{};
-    };
+    struct ShutdownEvent {};
 
     enum EventType {
         Update,
@@ -26,7 +24,7 @@ struct Event {
         Shutdown,
     };
 
-    EventType type = Update;
+    EventType type{};
 
     union {
         UpdateEvent update;

@@ -1,5 +1,6 @@
 // Copyright (C) Tubbles github.com/Tubbles
 
+#include "collision.hpp"
 #include "event.hpp"
 #include "imgui-SFML.h"
 #include "imgui.h"
@@ -35,6 +36,12 @@ auto main(int argc, char *argv[]) -> int {
     debug::setup(my_dir, window);
 #endif
 
+    sf::RectangleShape roof{{640, 10}};
+    sf::RectangleShape floor{{640, 10}};
+    roof.setPosition(0, -10);
+    floor.setPosition(0, 480);
+    col::register_shape(roof);
+    col::register_shape(floor);
     Paddle paddle1{Paddle::Player::One};
     Paddle paddle2{Paddle::Player::Two};
 
@@ -71,13 +78,12 @@ auto main(int argc, char *argv[]) -> int {
         // Draw
         window.clear();
         // window.draw(shape);
-        event::schd::post(
-            event::schd::Event{.type = event::schd::Type::Draw, .draw = {.window = &window}});
+        event::schd::post(event::schd::Event{.type = event::schd::Type::Draw, .draw = {.window = &window}});
         window.display();
     }
 
     // Shutdown
-    event::schd::post(event::schd::Event{.type = event::schd::Type::Shutdown, .shutdown = {}});
+    event::schd::post(event::schd::Event{.type = event::schd::Type::Shutdown, .shutdown{}});
 
     return 0;
 }

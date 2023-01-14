@@ -20,7 +20,9 @@ Checks:          'clang-diagnostic-*,clang-analyzer-*,
                   -cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,
                   -hicpp-uppercase-literal-suffix,-readability-uppercase-literal-suffix,
                   -cppcoreguidelines-pro-type-vararg,-hicpp-vararg,
-                  -llvm-header-guard'
+                  -llvm-header-guard,
+                  -bugprone-branch-clone,
+                  -clang-diagnostic-undefined-var-template'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
