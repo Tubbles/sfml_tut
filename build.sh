@@ -7,21 +7,23 @@ target_dir="$my_dir/target"
 app_name="$(grep -E '^project(.+)' CMakeLists.txt | sed -E 's/project\((.+)\)/\1/g')"
 
 implicit_build=true
+verbose=false
+extra_verbose=false
+clang=false
+target="debug"
+target_dir_target="$target_dir/debug"
 clean=false
 build=false
 lint=false
 format=false
 run=false
-verbose=false
-extra_verbose=false
-target="debug"
-target_dir_target="$target_dir/debug"
 
 usage="Usage: $0 [options]
 where [options] can be zero or more of:
   ?,h,help,--help    display this help text and exit
   v,verbose          run more verbosely
   extra-verbose      run with all verbose text
+  clang              build using clang instead of system default
   debug,release      build for debug (default) or release target
   clean              clean everything, does not build implicitly
   build              build, implicitly selected
@@ -44,8 +46,11 @@ case $1 in
         extra_verbose=true
         set -x
         ;;
+    clang)
+        clang=true
+        ;;
     debug)
-        target="debug" || $run == true
+        target="debug"
         target_dir_target="$target_dir/debug"
         ;;
     release)
@@ -113,6 +118,11 @@ clang-format --style=file -i "$my_dir/src/"*.{cpp,hpp}
 
 if [[ $clean == true ]]; then
     rm -fr "$target_dir"
+fi
+
+if [[ $clang == true ]]; then
+    export CC=/usr/bin/clang
+    export CXX=/usr/bin/clang++
 fi
 
 if [[ $build == true ]]; then

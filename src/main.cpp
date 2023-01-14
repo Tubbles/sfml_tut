@@ -4,6 +4,7 @@
 #include "imgui-SFML.h"
 #include "imgui.h"
 #include "log.hpp"
+#include "paddle.hpp"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Clock.hpp>
@@ -27,8 +28,6 @@ auto main(int argc, char *argv[]) -> int {
         spdlog::info("Arg #{}#", arg);
     }
 
-    event::schd::post(event::schd::Event{.type = event::schd::Type::Init, .init = {}});
-
     sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Tutorial");
     window.setVerticalSyncEnabled(true); // Cap at 60 Hz
 
@@ -36,8 +35,8 @@ auto main(int argc, char *argv[]) -> int {
     debug::setup(my_dir, window);
 #endif
 
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    Paddle paddle1{Paddle::Player::One};
+    Paddle paddle2{Paddle::Player::Two};
 
     sf::Clock deltaClock;
 
@@ -66,12 +65,14 @@ auto main(int argc, char *argv[]) -> int {
         }
 
         // Update
-        event::schd::post(event::schd::Event{.type = event::schd::Type::Update, .update = {deltaClock.restart()}});
+        event::schd::post(
+            event::schd::Event{.type = event::schd::Type::Update, .update = {.delta = deltaClock.restart()}});
 
         // Draw
         window.clear();
-        window.draw(shape);
-        event::schd::post(event::schd::Event{.type = event::schd::Type::Draw, .draw = {}});
+        // window.draw(shape);
+        event::schd::post(
+            event::schd::Event{.type = event::schd::Type::Draw, .draw = {.window = &window}});
         window.display();
     }
 

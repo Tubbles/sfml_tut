@@ -33,7 +33,8 @@ void setup(fs::path &my_dir, sf::RenderWindow &window) {
         return event::Action::Pass;
     });
 
-    event::schd::register_callback(event::schd::Type::Draw, 500, [&](event::schd::Event) {
+    event::schd::register_callback(event::schd::Type::Draw, 500, [&](event::schd::Event event) {
+        auto &window = *event.draw.window;
         if (show_imgui) {
             ImGui::Begin("FPS");
             ImGui::Text("%s", fmt::format("{:.1f}", ImGui::GetIO().Framerate).c_str());

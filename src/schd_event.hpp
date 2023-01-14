@@ -2,37 +2,33 @@
 
 #pragma once
 
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Time.hpp>
+#include <memory>
 
 namespace schd {
 struct Event {
-    struct InitEvent {
-        int a;
-    };
-
     struct UpdateEvent {
-        sf::Time delta;
+        sf::Time delta{};
     };
 
     struct DrawEvent {
-        int a;
+        sf::RenderWindow *window{};
     };
 
     struct ShutdownEvent {
-        int a;
+        int a{};
     };
 
     enum EventType {
-        Init,
         Update,
         Draw,
         Shutdown,
     };
 
-    EventType type;
+    EventType type = Update;
 
     union {
-        InitEvent init;
         UpdateEvent update;
         DrawEvent draw;
         ShutdownEvent shutdown;
