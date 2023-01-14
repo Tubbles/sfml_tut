@@ -41,29 +41,18 @@ auto main(int argc, char *argv[]) -> int {
 
     sf::Clock deltaClock;
 
-#ifndef NDEBUG
-    bool show_imgui = false;
-
-    event::sfml::register_callback(event::sfml::Type::KeyPressed, 500, [&show_imgui](event::sfml::Event &event) {
-        if (event.key.code == sf::Keyboard::F1) {
-            show_imgui = !show_imgui;
-        }
-        return false;
-    });
-#endif
-
-    event::sfml::register_callback(event::sfml::Type::Closed, 999, [&window](event::sfml::Event &event) {
+    event::sfml::register_callback(event::sfml::Type::Closed, 999, [&window](event::sfml::Event event) {
         (void)event;
         window.close();
-        return true;
+        return event::Action::Block;
     });
 
-    event::sfml::register_callback(event::sfml::Type::KeyPressed, 999, [&window](event::sfml::Event &event) {
+    event::sfml::register_callback(event::sfml::Type::KeyPressed, 999, [&window](event::sfml::Event event) {
         if (event.key.code == sf::Keyboard::Escape) {
             window.close();
-            return true;
+            return event::Action::Block;
         }
-        return false;
+        return event::Action::Pass;
     });
 
     while (window.isOpen()) {
@@ -79,32 +68,15 @@ auto main(int argc, char *argv[]) -> int {
         // Update
         event::schd::post(event::schd::Event{.type = event::schd::Type::Update, .update = {deltaClock.restart()}});
 
+        // Draw
         window.clear();
         window.draw(shape);
-
-        // Draw
         event::schd::post(event::schd::Event{.type = event::schd::Type::Draw, .draw = {}});
-#ifndef NDEBUG
-        ImGui::SFML::Update(window, deltaClock.restart());
-
-        if (show_imgui) {
-            ImGui::Begin("FPS");
-            ImGui::Text("%s", fmt::format("{:.1f}", ImGui::GetIO().Framerate).c_str());
-            ImGui::End();
-            ImGui::SFML::Render(window);
-        } else {
-            ImGui::EndFrame();
-        }
-#endif
-
         window.display();
     }
 
     // Shutdown
     event::schd::post(event::schd::Event{.type = event::schd::Type::Shutdown, .shutdown = {}});
-#ifndef NDEBUG
-    ImGui::SFML::Shutdown();
-#endif
 
     return 0;
 }

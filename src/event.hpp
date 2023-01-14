@@ -10,11 +10,15 @@
 #include <typeinfo>
 
 namespace event {
+enum class Action {
+    Pass,  // Pass on the event to the next handler
+    Block, // Finish parsing this event
+};
 template <typename TypeT, typename EventT> struct Manager {
     using Type = TypeT;
     using Event = EventT;
     // Callback typedef, return true if no more event processing shall occur for this event
-    using Callback = std::function<bool(Event &)>;
+    using Callback = std::function<Action(Event)>;
     struct PrioCallback {
         Callback callback;
         uint32_t prio;
@@ -46,7 +50,7 @@ template <typename TypeT, typename EventT> struct Manager {
     static void post(Event event) {
         auto &vec = callbacks[event.type];
         for (auto &elem : vec) {
-            if (elem.callback(event)) {
+            if (elem.callback(event) == Action::Block) {
                 break;
             }
         }
