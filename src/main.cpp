@@ -1,5 +1,6 @@
 // Copyright (C) Tubbles github.com/Tubbles
 
+#include "body.hpp"
 #include "collision.hpp"
 #include "event.hpp"
 #include "imgui-SFML.h"
@@ -40,8 +41,8 @@ auto main(int argc, char *argv[]) -> int {
     sf::RectangleShape floor{{640, 10}};
     roof.setPosition(0, -10);
     floor.setPosition(0, 480);
-    col::register_shape(roof);
-    col::register_shape(floor);
+    col::register_body({.shape = &roof});
+    col::register_body({.shape = &floor});
     Paddle paddle1{Paddle::Player::One};
     Paddle paddle2{Paddle::Player::Two};
 

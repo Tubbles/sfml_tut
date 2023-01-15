@@ -13,7 +13,7 @@ struct Paddle {
         Two,
     };
     explicit Paddle(Player a_player) : player(a_player), shape{{10, 40}} {
-        col::register_shape(shape);
+        col::register_body({.shape = &shape});
         if (player == Player::One) {
             keymap = {sf::Keyboard::A, sf::Keyboard::Z, sf::Keyboard::Q};
             shape.setPosition({10, 240});
@@ -59,7 +59,7 @@ struct Paddle {
             shape.move(0.0f, (up_vel + down_vel) * speed * time.asSeconds());
 
             // Check collision
-            for (auto col : col::get(shape)) {
+            for (auto col : col::get({.shape = &shape})) {
                 (void)col;
                 spdlog::debug("Collision detected!");
             }

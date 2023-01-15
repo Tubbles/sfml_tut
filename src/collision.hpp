@@ -2,23 +2,14 @@
 
 #pragma once
 
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#include "body.hpp"
+#include <SFML/Graphics/Shape.hpp>
+#include <variant>
 #include <vector>
 
 namespace col {
 struct Collision {
-    enum Type {
-        Circle,
-        Rectangle,
-    };
-
-    Type other_type{};
-
-    union {
-        sf::RectangleShape *rect;
-        sf::CircleShape *circle;
-    };
+    Body other{};
 };
 
 enum class Move {
@@ -27,10 +18,7 @@ enum class Move {
     Both,
 };
 
-void register_shape(sf::RectangleShape &);
-void register_shape(sf::CircleShape &);
-auto get(sf::RectangleShape &) -> std::vector<Collision>;
-auto get(sf::CircleShape &) -> std::vector<Collision>;
-void move(Collision, sf::RectangleShape &, Move);
-void move(Collision, sf::CircleShape &, Move);
+void register_body(const Body &);
+auto get(const Body &) -> std::vector<Collision>;
+void move(const Body &, const Collision &, Move);
 } // namespace col
