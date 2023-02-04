@@ -37,12 +37,14 @@ auto main(int argc, char *argv[]) -> int {
     debug::setup(my_dir, window);
 #endif
 
+    col::init();
+
     sf::RectangleShape roof{{640, 10}};
     sf::RectangleShape floor{{640, 10}};
     roof.setPosition(0, -10);
     floor.setPosition(0, 480);
-    col::register_body({.shape = &roof});
-    col::register_body({.shape = &floor});
+    col::register_body({.shape = &roof, .is_static = true, .plasticity = std::numeric_limits<float>::infinity()});
+    col::register_body({.shape = &floor, .is_static = true, .plasticity = std::numeric_limits<float>::infinity()});
     Paddle paddle1{Paddle::Player::One};
     Paddle paddle2{Paddle::Player::Two};
 

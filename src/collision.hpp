@@ -12,13 +12,9 @@ struct Collision {
     Body other{};
 };
 
-enum class Move {
-    Me,
-    Them,
-    Both,
-};
-
-void register_body(const Body &);
+void init();
+void register_body(std::shared_ptr<Body> body);
+void register_body(Body &&);
 auto get(const Body &) -> std::vector<Collision>;
-void move(const Body &, const Collision &, Move);
+void solve(const Body &, const Collision &, float seconds);
 } // namespace col

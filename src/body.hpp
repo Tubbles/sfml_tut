@@ -9,5 +9,7 @@
 struct Body {
     sf::Shape *shape{};
     sf::Vector2f velocity{};
-    bool is_static{false};
+    bool is_static{false}; // moves during collision solving
+    float mass{};
+    float plasticity{}; // 0 = fully elastic collisions (bounce), inf = fully plastic collisions (absorb)
 };
