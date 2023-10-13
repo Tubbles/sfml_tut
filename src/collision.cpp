@@ -99,15 +99,15 @@ auto get(const Body &body) -> std::vector<Collision> {
     return vec;
 }
 
-static bool col_overlap(const sf::RectangleShape &r1, const sf::RectangleShape &r2) {
-    auto pos = r1.getPosition();
-    auto size = r1.getSize();
-    auto opos = r2.getPosition();
-    auto osize = r2.getSize();
+// static bool col_overlap(const sf::RectangleShape &r1, const sf::RectangleShape &r2) {
+//     auto pos = r1.getPosition();
+//     auto size = r1.getSize();
+//     auto opos = r2.getPosition();
+//     auto osize = r2.getSize();
 
-    return ((pos.x < (opos.x + osize.x)) && ((pos.x + size.x) > opos.x) && (pos.y < (opos.y + osize.y)) &&
-            ((pos.y + size.y) > opos.y));
-}
+//     return ((pos.x < (opos.x + osize.x)) && ((pos.x + size.x) > opos.x) && (pos.y < (opos.y + osize.y)) &&
+//             ((pos.y + size.y) > opos.y));
+// }
 
 void solve(const Body &body, const Collision &col, float seconds) {
     (void)seconds;

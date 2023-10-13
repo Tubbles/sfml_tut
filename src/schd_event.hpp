@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Time.hpp>
+#include <fmt/format.h>
 #include <memory>
 
 namespace schd {
@@ -31,5 +32,7 @@ struct Event {
         DrawEvent draw;
         ShutdownEvent shutdown;
     };
+    // static auto format_as(const Event::EventType &type) { fmt::underlying(type); }
 };
+
 } // namespace schd

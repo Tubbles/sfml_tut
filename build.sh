@@ -2,8 +2,8 @@
 
 set -e
 
-my_dir="$(dirname "$(realpath "$0")")"
-target_dir="$my_dir/target"
+my_dir="$(dirname "$(realpath "${0}")")"
+target_dir="${my_dir}/target"
 app_name="$(grep -E '^project(.+)' CMakeLists.txt | sed -E 's/project\((.+)\)/\1/g')"
 
 implicit_build=true
@@ -11,14 +11,14 @@ verbose=false
 extra_verbose=false
 clang=false
 target="debug"
-target_dir_target="$target_dir/debug"
+target_dir_target="${target_dir}/debug"
 clean=false
 build=false
 lint=false
 format=false
 run=false
 
-usage="Usage: $0 [options]
+usage="Usage: ${0} [options]
 where [options] can be zero or more of:
   ?,h,help,--help    display this help text and exit
   v,verbose          run more verbosely
@@ -33,9 +33,9 @@ where [options] can be zero or more of:
   --                 pass the following args to the program, if running"
 
 while (($#)); do
-case $1 in
+case ${1} in
     \?|h|help|--help)
-        echo "$usage"
+        echo "${usage}"
         exit 0
         ;;
     v|verbose)
@@ -51,11 +51,11 @@ case $1 in
         ;;
     debug)
         target="debug"
-        target_dir_target="$target_dir/debug"
+        target_dir_target="${target_dir}/debug"
         ;;
     release)
         target="release"
-        target_dir_target="$target_dir/release"
+        target_dir_target="${target_dir}/release"
         ;;
     clean)
         clean=true
@@ -69,7 +69,7 @@ case $1 in
         implicit_build=false
         ;;
     format)
-        format=true
+        # format=true
         implicit_build=false
         ;;
     run)
@@ -81,8 +81,8 @@ case $1 in
         break
         ;;
     *)
-        echo "Unknown argument: \"$1\""
-        echo "$usage"
+        echo "Unknown argument: \"${1}\""
+        echo "${usage}"
         exit 1
         ;;
 esac
@@ -90,52 +90,54 @@ shift
 done
 
 cmake_debug=""
-if [[ $target == "debug" ]]; then
+if [[ ${target} == "debug" ]]; then
     cmake_debug="-DCMAKE_BUILD_TYPE=Debug"
-elif [[ $target == "release" ]]; then
+elif [[ ${target} == "release" ]]; then
     cmake_debug="-DCMAKE_BUILD_TYPE=Release"
 fi
 
 ninja_verbose=""
-if [[ $verbose == true ]]; then
+if [[ ${verbose} == true ]]; then
     ninja_verbose="-v"
 fi
 
 cmake_verbose=""
-if [[ $extra_verbose == true ]]; then
-    cmake_files=$(find "$my_dir" \( -name CMakeLists.txt -or -name '*.cmake' \) -not -path '*/modules/*/*' -not -path '*/target/*' | paste -sd' ')
+if [[ ${extra_verbose} == true ]]; then
+    cmake_files=$(find "${my_dir}" \( -name CMakeLists.txt -or -name '*.cmake' \) -not -path '*/modules/*/*' -not -path '*/target/*' | paste -sd' ')
     cmake_verbose="--trace-expand "
-    for file in $cmake_files; do
-        cmake_verbose+="--trace-source=$file "
+    for file in ${cmake_files}; do
+        cmake_verbose+="--trace-source=${file} "
     done
 fi
 
-if [[ $implicit_build == true ]]; then
+if [[ ${implicit_build} == true ]]; then
     build=true
 fi
 
-clang-format --style=file -i "$my_dir/src/"*.{cpp,hpp}
+clang-format --style=file -i "${my_dir}/src/"*.{cpp,hpp}
 
-if [[ $clean == true ]]; then
-    rm -fr "$target_dir"
+if [[ ${clean} == true ]]; then
+    rm -fr "${target_dir}"
 fi
 
-if [[ $clang == true ]]; then
+if [[ ${clang} == true ]]; then
     export CC=/usr/bin/clang
     export CXX=/usr/bin/clang++
 fi
 
-if [[ $build == true ]]; then
-    mkdir -p "$target_dir_target"
-    cmake $cmake_verbose -S "$my_dir" -B "$target_dir_target" -G Ninja $cmake_debug
-    cmake --build "$target_dir_target" -- $ninja_verbose
+if [[ ${build} == true ]]; then
+    mkdir -p "${target_dir_target}"
+    # shellcheck disable=2086,2248
+    cmake ${cmake_verbose} -S "${my_dir}" -B "${target_dir_target}" -G Ninja ${cmake_debug}
+    # shellcheck disable=2248
+    cmake --build "${target_dir_target}" -- ${ninja_verbose}
 fi
 
-if [[ $lint == true ]]; then
-      clang-tidy -p "$my_dir/target/debug" "$my_dir/src"/*.cpp
-      clang-tidy -p "$my_dir/target/debug" --config-file="$my_dir/.clang-tidy-fixes" --fix --format-style=file "$my_dir/src"/*.{cpp,hpp}
+if [[ ${lint} == true ]]; then
+      clang-tidy -p "${my_dir}/target/debug" "${my_dir}/src"/*.cpp
+      clang-tidy -p "${my_dir}/target/debug" --config-file="${my_dir}/.clang-tidy-fixes" --fix --format-style=file "${my_dir}/src"/*.{cpp,hpp}
 fi
 
-if [[ $run == true ]]; then
-    "$target_dir_target/$app_name" "$@"
+if [[ ${run} == true ]]; then
+    "${target_dir_target}/${app_name}" "$@"
 fi

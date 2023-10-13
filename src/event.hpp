@@ -30,21 +30,21 @@ template <typename TypeT, typename EventT> struct Manager {
 
     static void register_callback(Type type, uint32_t priority, const Callback &callback) {
         spdlog::debug("Attempting to register {} callback for event type {} with priority {}", typeid(Event).name(),
-                      type, priority);
+                      (int)type, priority);
         auto &vec = callbacks[type];
 
         for (auto it = vec.begin(); it != vec.end(); ++it) {
             if (priority < (*it).prio) {
                 vec.insert(it, {callback, priority});
                 spdlog::debug("Registered {} callback for event type {} with priority {} (insert)",
-                              typeid(Event).name(), type, priority);
+                              typeid(Event).name(), (int)type, priority);
                 return;
             }
         }
 
         vec.push_back({callback, priority});
-        spdlog::debug("Registered {} callback for event type {} with priority {} (push)", typeid(Event).name(), type,
-                      priority);
+        spdlog::debug("Registered {} callback for event type {} with priority {} (push)", typeid(Event).name(),
+                      (int)type, priority);
     }
 
     static void post(Event event) {
